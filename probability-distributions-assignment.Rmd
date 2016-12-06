@@ -17,13 +17,85 @@ datos <- BATTERY
 Fíjate que tienes que tener instalado el paquete PASWR2 para poder acceder a este conjunto de datos. La variable de interés es lifetime, pero como sabemos que los datos se refieren a dos tipos distintos de baterías, posiblemente nos interese separarlos. En esta práctica vamos a realizar cálculo de probabilidades basados en este conjunto de datos para que se vea una aplicación, aunque tengamos que hacer uso de algún
 concepto de inferencia.
 
+```{r import-libraries, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+```
+
 ## Actividad 1
 
-* Realiza un histograma de todas las filas de la variable lifetime y comprueba que efectivamente nos
-interesa separar los datos.
+* Realiza un histograma de todas las filas de la variable lifetime y comprueba que efectivamente nos interesa separar los datos.
+
+```{r 1A}
+datos %>%
+  select(lifetime) %>%
+  ggplot(aes(x=lifetime)) +
+  geom_histogram(aes(fill=..count..), binwidth=0.5) +
+  xlim(170, 210) +
+  xlab('lifetime (hours)')
+```
+
+Como se ve en la figura anterior, existe un hueco entre los valores 185 (aproximadamente) y 195 (aproximadamente). Este hueco forma dos subconjuntos de datos y esto quiere decir que será interesante analizar por separado ambos conjuntos. Podríamos decir que hay dos tipos de baterías en función de su tiempo de vida.
+
 * Crea dos conjuntos de datos diferentes para los dos tipos de baterías, por ejemplo datosA y datosB
+```{r 1B}
+batteries_type_b <- datos %>%
+                      filter(lifetime < 190)
+
+batteries_type_a <- datos %>%
+                      filter(lifetime > 190)
+```
+
+Aquellas baterías con tiempo de vida menor a 190 horas serán _Baterías de tipo B_ y aquellas con un tiempo de vida mayor a 190 horas serán las _Baterías de tipo A_.
+
 * Realiza ahora un histograma de cada uno de los tipos y comenta si te parece que los datos siguen una distribucion normal
+```{r 1C}
+batteries_type_b %>%
+  select(lifetime) %>%
+  ggplot(aes(x=lifetime)) +
+  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.25) +
+  xlim(170, 185) + 
+  geom_density(alpha=.2, fill="#FF6666") +
+  xlab('lifetime (hours)')
+
+summary(batteries_type_b)
+
+batteries_type_a %>%
+  select(lifetime) %>%
+  ggplot(aes(x=lifetime)) +
+  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.5) +
+  xlim(190, 210) +
+  geom_density(alpha=.2, fill="#FF6666") +
+  xlab('lifetime (hours)')
+
+summary(batteries_type_a)
+```
+
+Es difícil dar un pronóstico ya que la anchura de las barras del histograma que he seleccionado no permite apreciar bien si se forma una gráfica típica de una distribución normal. Si dibujamos por encima del histograma el diagrama de densidad de probabilidad, aunque parece que se asemeja a una distribución normal ya que es más o menos simétrica y centrada en la media, el dibujo no es exactamente como el de una campana de Gauss. 
+
+Será necesario realizar test de normalidad o gráficos que nos ayuden a comprobar esto.
+
 * Confirma tus conclusiones con alguna/s de las herramientas vistas en clase (test de normalidad, gráfico Quantil-Quantil)
+
+```{r 1D}
+library(scales)
+
+qqnorm(batteries_type_b$lifetime, pch = 20, col = alpha("red4", 0.5), las = 1)
+grid()
+qqline(batteries_type_b$lifetime, lwd = 2)
+
+qqnorm(batteries_type_a$lifetime, pch = 20, col = alpha("red4", 0.5), las = 1)
+grid()
+qqline(batteries_type_a$lifetime, lwd = 2)
+
+shapiro.test(batteries_type_b$lifetime)
+shapiro.test(batteries_type_a$lifetime)
+```
+
+Con el test de normalidad Shapiro-Wilk para un valor $\alpha$ de 0.05, como la hipótesis nula es que la población sigue una distribución normal y nuestros p-valor son mayores que $\alpha$, no podemos rechazar que la distribución sea normal.
+
+Gracias al gráfico Q-Q podemos ver que ambos conjuntos de datos se asemejan bastante a una distribución normal, especialmente *batteries_type_b* (los puntos rojos, que son las muestras de cuantiles, se aproximan mucho a los cuantiles teóricos, la recta negra).
 
 ## Actividad 2
 
