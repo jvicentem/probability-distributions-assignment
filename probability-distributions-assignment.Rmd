@@ -51,16 +51,6 @@ Aquellas baterías con tiempo de vida menor a 190 horas serán _Baterías de tip
 
 * Realiza ahora un histograma de cada uno de los tipos y comenta si te parece que los datos siguen una distribucion normal
 ```{r 1C}
-batteries_type_b %>%
-  select(lifetime) %>%
-  ggplot(aes(x=lifetime)) +
-  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.25) +
-  xlim(170, 185) + 
-  geom_density(alpha=.2, fill="#FF6666") +
-  xlab('lifetime (hours)')
-
-summary(batteries_type_b)
-
 batteries_type_a %>%
   select(lifetime) %>%
   ggplot(aes(x=lifetime)) +
@@ -70,6 +60,16 @@ batteries_type_a %>%
   xlab('lifetime (hours)')
 
 summary(batteries_type_a)
+
+batteries_type_b %>%
+  select(lifetime) %>%
+  ggplot(aes(x=lifetime)) +
+  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.25) +
+  xlim(170, 185) + 
+  geom_density(alpha=.2, fill="#FF6666") +
+  xlab('lifetime (hours)')
+
+summary(batteries_type_b)
 ```
 
 Es difícil dar un pronóstico ya que la anchura de las barras del histograma que he seleccionado no permite apreciar bien si se forma una gráfica típica de una distribución normal. Si dibujamos por encima del histograma el diagrama de densidad de probabilidad, aunque parece que se asemeja a una distribución normal ya que es más o menos simétrica y centrada en la media, el dibujo no es exactamente como el de una campana de Gauss. 
@@ -81,16 +81,16 @@ Será necesario realizar test de normalidad o gráficos que nos ayuden a comprob
 ```{r 1D}
 library(scales)
 
-qqnorm(batteries_type_b$lifetime, pch = 20, col = alpha("red4", 0.5), las = 1)
-grid()
-qqline(batteries_type_b$lifetime, lwd = 2)
-
 qqnorm(batteries_type_a$lifetime, pch = 20, col = alpha("red4", 0.5), las = 1)
 grid()
 qqline(batteries_type_a$lifetime, lwd = 2)
 
-shapiro.test(batteries_type_b$lifetime)
+qqnorm(batteries_type_b$lifetime, pch = 20, col = alpha("red4", 0.5), las = 1)
+grid()
+qqline(batteries_type_b$lifetime, lwd = 2)
+
 shapiro.test(batteries_type_a$lifetime)
+shapiro.test(batteries_type_b$lifetime)
 ```
 
 Con el test de normalidad Shapiro-Wilk para un valor $\alpha$ de 0.05, como la hipótesis nula es que la población sigue una distribución normal y nuestros p-valor son mayores que $\alpha$, no podemos rechazar que la distribución sea normal.
@@ -102,10 +102,41 @@ Gracias al gráfico Q-Q podemos ver que ambos conjuntos de datos se asemejan bas
 Ahora que sabemos que nuestros datos siguen aproximadamente una distribución normal, tendríamos que estimar sus parámetros µ y σ. A partir de ahí, podemos realizar cálculo de probabilidades de la normal.
 
 * Realiza una estimación de la media y la desviación típica de la población de cada tipo de baterías.
+
+```{r 2A, warning=FALSE}
+library(fitdistrplus)
+
+print('Estimaciones para las baterías de tipo A')
+fitdist(batteries_type_a$lifetime, "norm")
+print('Estimaciones para las baterías de tipo B')
+fitdist(batteries_type_b$lifetime, "norm")
+```
+
+Para realizar las estimaciones de la media y de la desviación típica he hecho uso del paquete fitdistrplus. Con el parámetro 'norm' se indica que se quieren estimar los parámetros de una distribución normal ($\mu$ y $\sigma$). El método empleado es el de máxima verosimilitud.
+
+Para las baterías de tipo A, los valores estimados de los parámetros son $\mu$ = 179.680524 y $\sigma$ = 2.064022.
+
+Para las baterías de tipo B, los valores estimados de los parámetros son $\mu$ = 200.50866 y $\sigma$ = 2.71818.
+
 * Calcula la probabilidad de que una batería tomada al azar del tipo A dure más de 210 horas
+
+```{r, 2B}
+1 - pnorm(q = 210, mean = 200.50866, sd = 2.71818)
+```
+La probabilidad de que haya una batería tomada al azar del tipo A y que dure más de 210 horas es del 0%.
+
 * Calcula la probabilidad de que una batería tomada al azar del tipo B dure menos de 175 horas
-* Encuentra cuál es la duración máxima del 3% de las pilas del tipo B que duran menos (ayuda: esto es
-equivalente a encontrar el cuantil 0.03)
+```{r, 2C}
+pnorm(q = 175, mean = 179.680524, sd = 2.064022)
+```
+La probabilidad de que haya una batería tomada al azar del tipo B y que dure menos de 175 horas es del 1.167462%.
+
+* Encuentra cuál es la duración máxima del 3% de las pilas del tipo B que duran menos (ayuda: esto es equivalente a encontrar el cuantil 0.03)
+
+```{r, 2D}
+qnorm(p = 0.03, mean = 179.680524, sd = 2.064022)
+```
+La duración máxima del 3% de las pilas del tipo B que duran menos es de 195.3963 horas.
 
 ## Actividad 3
 
