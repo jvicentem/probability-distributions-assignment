@@ -121,7 +121,7 @@ Para las baterías de tipo B, los valores estimados de los parámetros son $\mu$
 * Calcula la probabilidad de que una batería tomada al azar del tipo A dure más de 210 horas
 
 ```{r, 2B}
-1 - pnorm(q = 210, mean = 200.50866, sd = 2.71818)
+pnorm(q = 210, mean = 200.50866, sd = 2.71818, lower.tail = FALSE)
 ```
 La probabilidad de que haya una batería tomada al azar del tipo A y que dure más de 210 horas es del 0%.
 
@@ -143,8 +143,28 @@ La duración máxima del 3% de las pilas del tipo B que duran menos es de 195.39
 Vamos a centrarnos ahora en las baterías de tipo B. Supongamos que una duración por debajo de 175 horas no es aceptable para el usuario de la batería. En la actividad anterior hemos calculado la probabilidad p de que esto suceda. Entonces, si tomamos una batería del tipo B al azar y comprobamos si dura menos de 175 horas, estamos realizando un experimento de Bernoulli con probabilidad p.
 
 * Calcula la probabilidad de que en un lote de 10 baterías, no haya ninguna defectuosa (ayuda: distribución binomial).
+
+```{r, 3A}
+pbinom(q = 0, size = 10, prob = 0.01167462)
+```
+
+La probabilidad de que haya 0 baterías defectuosas en un lote de 10 es de 88.92001%.
+
 * Imagina que las baterías se fabrican en serie e independientemente. ¿Cuál es la probabilidad de que la batería producida en quinto lugar sea la primera defectuosa? (ayuda: distribución geométrica. Ojo: en R, la variable X representa el número de fracasos hasta el primer éxito)
+
+```{r, 3B}
+pgeom(q = 4, prob = 0.01167462)
+```
+
+La probabilidad de que la batería producida en quinto lugar sea la primera defectuosa es del 5.702595%.
+
 * Supongamos que en una caja de 20 baterías van 3 defectuosas. ¿Cuál es la probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa? (ayuda: distribución hipergeométrica)
+
+```{r, 3C}
+dhyper(x = 1, m = 3, n = 17, k = 5)
+```
+
+La probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa es del 46.05263%.
 
 ## Actividad 4
 
