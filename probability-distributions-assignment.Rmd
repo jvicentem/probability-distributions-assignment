@@ -171,9 +171,28 @@ La probabilidad de que al tomar una muestra sin reposición de 5 baterías al me
 Seguimos con las baterías de tipo B, pero en vez de hacer experimentos de bernoulli queremos estudiar el número de baterías defectuosas fabricadas cada día. Supongamos que se fabrican 1000 baterías cada día. Entonces, cada día en promedio se estarán produciendo aproximadamente 1000 × p baterías, y el número de baterías defectuosas por día sigue una distribución de Poisson. Tomemos 12 como ese promedio de baterías defectuosas cada día.
 
 * ¿Cuál es la probabilidad de que un día se produzcan más de 20 baterías defectuosas?
+```{r, 4A}
+ppois(q = 19, lambda = 12, lower.tail = FALSE)
+```
+
+La probabilidad de que en un día se produzcan más de 20 baterías defectuosas es del 2.127977%.
+
 * ¿Cuál es la probabilidad de que un día no salga ninguna batería defectuosa de la fábrica?
-* La fábrica funciona de lunes a viernes. ¿Qué distribución sigue el número de baterías defectuosas por
-semana?
+```{r, 4B}
+ppois(q = 0, lambda = 12)
+```
+
+La probabilidad de que un día no salga ninguna batería defectuosa de la fábrica es del 0.0006144212%.  
+
+* La fábrica funciona de lunes a viernes. ¿Qué distribución sigue el número de baterías defectuosas por semana?
+
+Siguiendo la suposición anterior, como cada día se fabrican 12 baterías defectuosas en promedio ($\lambda = 12$), el número promedio de baterías defectuosas a la semana será de 60 ($\lambda = 60$), ya que la fábrica funciona sólo de lunes a viernes, es decir, 5 días a la semana (12 baterías defectuosas por día * 5 días que funciona la fábrica por semana).
+
+Esto se puede realizar porque la suma de variables aleatorias de Poisson da como resultado otra variable aleatoria de Poisson cuyo valor es la suma de las variables aleatorias de Poisson. 
+
+Se tienen en cuenta 5 días de la semana únicamente, porque hay 2 días que la fábrica no está en funcionamiento. Para cada día que la fábrica funciona, este proceso sigue una distribución de Poisson con parámetro $\lambda = 12$. 
+
+Por la propiedad vista anteriormente, podemos sumar los $\lambda$ de cada día, resultando: $\lambda_{lunes} + \lambda_{martes} + \lambda_{miércoles} + \lambda_{jueves} + \lambda_{viernes} = 12 + 12 + 12 + 12 + 12 = 60$ baterías defectuosas por día.
 
 ## Actividad 5
 
