@@ -49,6 +49,8 @@ batteries_type_a <- datos %>%
 
 Aquellas baterías con tiempo de vida menor a 190 horas serán _Baterías de tipo B_ y aquellas con un tiempo de vida mayor a 190 horas serán las _Baterías de tipo A_.
 
+He decidido hacer esta diferenciación con el valor 190 porque no hay ninguna batería con tiempo de vida 190 horas y aquellos valores inferior a este pertenecerán a un tipo de batería y los mayores a otro tipo de batería.
+
 * Realiza ahora un histograma de cada uno de los tipos y comenta si te parece que los datos siguen una distribucion normal
 ```{r 1C}
 batteries_type_a %>%
@@ -72,7 +74,7 @@ batteries_type_b %>%
 summary(batteries_type_b)
 ```
 
-Es difícil dar un pronóstico ya que la anchura de las barras del histograma que he seleccionado no permite apreciar bien si se forma una gráfica típica de una distribución normal. Si dibujamos por encima del histograma el diagrama de densidad de probabilidad, aunque parece que se asemeja a una distribución normal ya que es más o menos simétrica y centrada en la media, el dibujo no es exactamente como el de una campana de Gauss. 
+Es difícil dar un pronóstico ya que la anchura de las barras del histograma que he seleccionado no permite apreciar bien si se forma una gráfica típica de una distribución normal. Si dibujamos por encima del histograma el diagrama de densidad de probabilidad, aunque parece que se asemeja a una distribución normal ya que es más o menos simétrica y centrada en la media, el dibujo no es exactamente igual a una campana de Gauss. 
 
 Será necesario realizar test de normalidad o gráficos que nos ayuden a comprobar esto.
 
@@ -144,6 +146,8 @@ Vamos a centrarnos ahora en las baterías de tipo B. Supongamos que una duració
 
 * Calcula la probabilidad de que en un lote de 10 baterías, no haya ninguna defectuosa (ayuda: distribución binomial).
 
+La distribución binomial cuenta el número de éxitos en una muestra de tamaño n. En nuestro caso, el tamaño de la muestra es n = 10 y la probabilidad de éxito del suceso (que una batería tomada al azar del tipo B dure menos de 175 horas) es de p = 0.01167462.
+
 ```{r 3A}
 pbinom(q = 0, size = 10, prob = 0.01167462)
 ```
@@ -152,6 +156,8 @@ La probabilidad de que haya 0 baterías defectuosas en un lote de 10 es de 88.92
 
 * Imagina que las baterías se fabrican en serie e independientemente. ¿Cuál es la probabilidad de que la batería producida en quinto lugar sea la primera defectuosa? (ayuda: distribución geométrica. Ojo: en R, la variable X representa el número de fracasos hasta el primer éxito)
 
+La distribución geométrica es una distribución de probabilidad del número de experimentos necesarios hasta obtener el primer éxito en una serie de pruebas independientes de Bernoulli con probabilidad de éxito p. En este caso, p = 0.01167462, siendo el caso de éxito que una batería tomada al azar del tipo B dure menos de 175 horas.
+
 ```{r 3B}
 pgeom(q = 4, prob = 0.01167462)
 ```
@@ -159,6 +165,10 @@ pgeom(q = 4, prob = 0.01167462)
 La probabilidad de que la batería producida en quinto lugar sea la primera defectuosa es del 5.702595%.
 
 * Supongamos que en una caja de 20 baterías van 3 defectuosas. ¿Cuál es la probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa? (ayuda: distribución hipergeométrica)
+
+La distribución hipergeométrica mide la probabilidad de obtener x ($0 \leq x \leq d$) elementos del grupo A, de una submuestra sin reemplazamiento de n elementos pertenecientes a una muestra de N elementos con d elementos de clase A.
+
+En este caso tenemos que d = 3, n = 5, N = 20. En la función dhyper m = d, n = N - d y k = n.
 
 ```{r 3C}
 dhyper(x = 1, m = 3, n = 17, k = 5)
@@ -169,6 +179,8 @@ La probabilidad de que al tomar una muestra sin reposición de 5 baterías al me
 ## Actividad 4
 
 Seguimos con las baterías de tipo B, pero en vez de hacer experimentos de bernoulli queremos estudiar el número de baterías defectuosas fabricadas cada día. Supongamos que se fabrican 1000 baterías cada día. Entonces, cada día en promedio se estarán produciendo aproximadamente 1000 × p baterías, y el número de baterías defectuosas por día sigue una distribución de Poisson. Tomemos 12 como ese promedio de baterías defectuosas cada día.
+
+Ahora estamos trabajando con la distribución de Poisson, muy útil para conocer la probabilidad con que ocurren eventos por unidad de tiempo. En este ejercicio λ = 12.
 
 * ¿Cuál es la probabilidad de que un día se produzcan más de 20 baterías defectuosas?
 ```{r 4A}
@@ -198,23 +210,23 @@ Por la propiedad vista anteriormente, podemos sumar los $\lambda$ de cada día, 
 
 El departamento de I+D de la empresa que fabrica las baterías tipo B está investigando nuevos materiales y métodos para mejorar la vida útil de las baterías. En particular, quieren llegar a diseñar una batería cuya duración siga una distribución de Weibull con parámetros a = 100 y b = 185.
 
+En esta ocasión emplearemos la distribución de Weibull porque es interesante para modelar tiempos de vida de mecanismos o elementos.
+
 * Realiza una simulación de la producción semanal de baterías (recuerda: 5 días de produccción, a 1000 baterías por día). Guarda los datos en un vector.
 ```{r 5A}
 weibull_simulation <- data.frame(rweibull(n = (5 * 1000), shape = 100, scale = 185))
 colnames(weibull_simulation) <- c('values')
 
 weibull_simulation %>%
-  select(values) %>%
   ggplot(aes(x=values)) +
   geom_histogram(aes(fill=..count..), binwidth=0.25, col='black') +
   xlab('lifetime (hours)')
 
 weibull_simulation %>%
-  select(values) %>%
   ggplot(aes(y=values, x='Baterías de tipo B')) +
   geom_boxplot() +
-  ylab('lifetime (hours)') +
-  xlab('')
+  xlab('') +
+  ylab('lifetime (hours)') 
 ```
 
 Con la función _rweibull_ generamos _n_ valores aleatorios a partir de una función de distribución Weibull con parámetros _shape_ (representa el parámetro a) y _scale_ (representa el parámetro b).
@@ -240,3 +252,6 @@ La duración media de las baterías mejora desde las 179.7 horas hasta las 184.0
 pweibull(q = 175, shape = 100, scale = 185)
 ```
 La probabilidad de que haya baterías defectuosas es del 0.3852956%. Es sin duda un porcentaje notablemente inferior al anterior, que era del 1.167462%. Supone una reducción de baterías defectuosas del 0.7821664% y una disminución del 66.99716% respecto a la probabilidad anterior.
+
+## Conclusiones y comentarios
+Me ha resultado una práctica amena y útil para refrescar la teoría sobre funciones de distribución de probabilidad. Esta práctica se ha realizado usando la sintáxis RMarkdown, además de las librerías magrittr, dplyr y knittr y el IDE RStudio. Como en cada práctica, he utilizado la herramienta de control de versiones Git y el repositorio GitHub de esta práctica se encuentra en [https://github.com/jvicentem/probability-distributions-assignment](https://github.com/jvicentem/probability-distributions-assignment).
