@@ -31,7 +31,7 @@ library(magrittr)
 datos %>%
   select(lifetime) %>%
   ggplot(aes(x=lifetime)) +
-  geom_histogram(aes(fill=..count..), binwidth=0.5) +
+  geom_histogram(aes(fill=..count..), binwidth=0.5, col='black') +
   xlim(170, 210) +
   xlab('lifetime (hours)')
 ```
@@ -54,7 +54,7 @@ Aquellas baterías con tiempo de vida menor a 190 horas serán _Baterías de tip
 batteries_type_a %>%
   select(lifetime) %>%
   ggplot(aes(x=lifetime)) +
-  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.5) +
+  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.5, col='black') +
   xlim(190, 210) +
   geom_density(alpha=.2, fill="#FF6666") +
   xlab('lifetime (hours)')
@@ -64,7 +64,7 @@ summary(batteries_type_a)
 batteries_type_b %>%
   select(lifetime) %>%
   ggplot(aes(x=lifetime)) +
-  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.25) +
+  geom_histogram(aes(y = ..density.., fill=..count..), binwidth=0.25, col='black') +
   xlim(170, 185) + 
   geom_density(alpha=.2, fill="#FF6666") +
   xlab('lifetime (hours)')
@@ -120,20 +120,20 @@ Para las baterías de tipo B, los valores estimados de los parámetros son $\mu$
 
 * Calcula la probabilidad de que una batería tomada al azar del tipo A dure más de 210 horas
 
-```{r, 2B}
+```{r 2B}
 pnorm(q = 210, mean = 200.50866, sd = 2.71818, lower.tail = FALSE)
 ```
 La probabilidad de que haya una batería tomada al azar del tipo A y que dure más de 210 horas es del 0%.
 
 * Calcula la probabilidad de que una batería tomada al azar del tipo B dure menos de 175 horas
-```{r, 2C}
+```{r 2C}
 pnorm(q = 175, mean = 179.680524, sd = 2.064022)
 ```
 La probabilidad de que haya una batería tomada al azar del tipo B y que dure menos de 175 horas es del 1.167462%.
 
 * Encuentra cuál es la duración máxima del 3% de las pilas del tipo B que duran menos (ayuda: esto es equivalente a encontrar el cuantil 0.03)
 
-```{r, 2D}
+```{r 2D}
 qnorm(p = 0.03, mean = 179.680524, sd = 2.064022)
 ```
 La duración máxima del 3% de las pilas del tipo B que duran menos es de 195.3963 horas.
@@ -144,7 +144,7 @@ Vamos a centrarnos ahora en las baterías de tipo B. Supongamos que una duració
 
 * Calcula la probabilidad de que en un lote de 10 baterías, no haya ninguna defectuosa (ayuda: distribución binomial).
 
-```{r, 3A}
+```{r 3A}
 pbinom(q = 0, size = 10, prob = 0.01167462)
 ```
 
@@ -152,7 +152,7 @@ La probabilidad de que haya 0 baterías defectuosas en un lote de 10 es de 88.92
 
 * Imagina que las baterías se fabrican en serie e independientemente. ¿Cuál es la probabilidad de que la batería producida en quinto lugar sea la primera defectuosa? (ayuda: distribución geométrica. Ojo: en R, la variable X representa el número de fracasos hasta el primer éxito)
 
-```{r, 3B}
+```{r 3B}
 pgeom(q = 4, prob = 0.01167462)
 ```
 
@@ -160,7 +160,7 @@ La probabilidad de que la batería producida en quinto lugar sea la primera defe
 
 * Supongamos que en una caja de 20 baterías van 3 defectuosas. ¿Cuál es la probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa? (ayuda: distribución hipergeométrica)
 
-```{r, 3C}
+```{r 3C}
 dhyper(x = 1, m = 3, n = 17, k = 5)
 ```
 
@@ -171,14 +171,14 @@ La probabilidad de que al tomar una muestra sin reposición de 5 baterías al me
 Seguimos con las baterías de tipo B, pero en vez de hacer experimentos de bernoulli queremos estudiar el número de baterías defectuosas fabricadas cada día. Supongamos que se fabrican 1000 baterías cada día. Entonces, cada día en promedio se estarán produciendo aproximadamente 1000 × p baterías, y el número de baterías defectuosas por día sigue una distribución de Poisson. Tomemos 12 como ese promedio de baterías defectuosas cada día.
 
 * ¿Cuál es la probabilidad de que un día se produzcan más de 20 baterías defectuosas?
-```{r, 4A}
+```{r 4A}
 ppois(q = 19, lambda = 12, lower.tail = FALSE)
 ```
 
 La probabilidad de que en un día se produzcan más de 20 baterías defectuosas es del 2.127977%.
 
 * ¿Cuál es la probabilidad de que un día no salga ninguna batería defectuosa de la fábrica?
-```{r, 4B}
+```{r 4B}
 ppois(q = 0, lambda = 12)
 ```
 
@@ -199,5 +199,44 @@ Por la propiedad vista anteriormente, podemos sumar los $\lambda$ de cada día, 
 El departamento de I+D de la empresa que fabrica las baterías tipo B está investigando nuevos materiales y métodos para mejorar la vida útil de las baterías. En particular, quieren llegar a diseñar una batería cuya duración siga una distribución de Weibull con parámetros a = 100 y b = 185.
 
 * Realiza una simulación de la producción semanal de baterías (recuerda: 5 días de produccción, a 1000 baterías por día). Guarda los datos en un vector.
-* Con este nuevo proceso, ¿se mejora realmente la duración media de las baterías? (ayuda: puedes usar los datos simulados o la expresión de la esperanza de una Weibull)
-* Los ingenieros no lo tienen muy claro (parece que la diferencia no es tanta en promedio y los nuevos materiales son costosos). Para demostrarles que merece la pena, calcula la proporción de baterías defectuosas que producirá el nuevo proceso y compárala con el anterior (la p que calculamos en la actividad 2)
+```{r 5A}
+weibull_simulation <- data.frame(rweibull(n = (5 * 1000), shape = 100, scale = 185))
+colnames(weibull_simulation) <- c('values')
+
+weibull_simulation %>%
+  select(values) %>%
+  ggplot(aes(x=values)) +
+  geom_histogram(aes(fill=..count..), binwidth=0.25, col='black') +
+  xlab('lifetime (hours)')
+
+weibull_simulation %>%
+  select(values) %>%
+  ggplot(aes(y=values, x='Baterías de tipo B')) +
+  geom_boxplot() +
+  ylab('lifetime (hours)') +
+  xlab('')
+```
+
+Con la función _rweibull_ generamos _n_ valores aleatorios a partir de una función de distribución Weibull con parámetros _shape_ (representa el parámetro a) y _scale_ (representa el parámetro b).
+
+* Con este nuevo proceso, ¿se mejora realmente la duración media de las baterías? (ayuda: puedes usar los datos simulados o la expresión de la esperanza de una Weibull).
+```{r 5B}
+summary(weibull_simulation)
+```
+
+Este es el _output_ del tercer apartado del primer ejercicio:
+    lifetime     facility
+ Min.   :174.2   A: 0    
+ 1st Qu.:178.5   B:50    
+ Median :179.6           
+ Mean   :179.7           
+ 3rd Qu.:181.1           
+ Max.   :183.6 
+ 
+La duración media de las baterías mejora desde las 179.7 horas hasta las 184.0 horas: supone una mejora de 4.3 horas de media, un 2.3929% más de duración.
+
+* Los ingenieros no lo tienen muy claro (parece que la diferencia no es tanta en promedio y los nuevos materiales son costosos). Para demostrarles que merece la pena, calcula la proporción de baterías defectuosas que producirá el nuevo proceso y compárala con el anterior (la p que calculamos en la actividad 2).
+```{r 5C}
+pweibull(q = 175, shape = 100, scale = 185)
+```
+La probabilidad de que haya baterías defectuosas es del 0.3852956%. Es sin duda un porcentaje notablemente inferior al anterior, que era del 1.167462%. Supone una reducción de baterías defectuosas del 0.7821664% y una disminución del 66.99716% respecto a la probabilidad anterior.
