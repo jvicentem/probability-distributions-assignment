@@ -159,10 +159,10 @@ La probabilidad de que haya 0 baterías defectuosas en un lote de 10 es de 88.92
 La distribución geométrica es una distribución de probabilidad del número de experimentos necesarios hasta obtener el primer éxito en una serie de pruebas independientes de Bernoulli con probabilidad de éxito p. En este caso, p = 0.01167462, siendo el caso de éxito que una batería tomada al azar del tipo B dure menos de 175 horas.
 
 ```{r 3B}
-pgeom(q = 4, prob = 0.01167462)
+dgeom(x = 4, prob = 0.01167462)
 ```
 
-La probabilidad de que la batería producida en quinto lugar sea la primera defectuosa es del 5.702595%.
+La probabilidad de que la batería producida en quinto lugar sea la primera defectuosa es del 1.113891%.
 
 * Supongamos que en una caja de 20 baterías van 3 defectuosas. ¿Cuál es la probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa? (ayuda: distribución hipergeométrica)
 
@@ -171,10 +171,10 @@ La distribución hipergeométrica mide la probabilidad de obtener x ($0 \leq x \
 En este caso tenemos que d = 3, n = 5, N = 20. En la función dhyper m = d, n = N - d y k = n.
 
 ```{r 3C}
-dhyper(x = 1, m = 3, n = 17, k = 5)
+phyper(q = 0, m = 3, n = 17, k = 5, lower.tail = FALSE)
 ```
 
-La probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa es del 46.05263%.
+La probabilidad de que al tomar una muestra sin reposición de 5 baterías al menos una sea defectuosa es del 60.08772%.
 
 ## Actividad 4
 
@@ -184,10 +184,10 @@ Ahora estamos trabajando con la distribución de Poisson, muy útil para conocer
 
 * ¿Cuál es la probabilidad de que un día se produzcan más de 20 baterías defectuosas?
 ```{r 4A}
-ppois(q = 19, lambda = 12, lower.tail = FALSE)
+ppois(q = 20, lambda = 12, lower.tail = FALSE)
 ```
 
-La probabilidad de que en un día se produzcan más de 20 baterías defectuosas es del 2.127977%.
+La probabilidad de que en un día se produzcan más de 20 baterías defectuosas es del 1.159774%.
 
 * ¿Cuál es la probabilidad de que un día no salga ninguna batería defectuosa de la fábrica?
 ```{r 4B}
